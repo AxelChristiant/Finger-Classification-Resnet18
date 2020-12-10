@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <title>Image Classification</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+            const Url = 'http://127.0.0.1:5000/predict'
+            
+            window.addEventListener('load', function() {
+            document.querySelector('input[type="file"]').addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    var img = document.getElementById('imageData');  
+                    img.src = URL.createObjectURL(this.files[0]); 
+
+                    var data = new FormData()
+                    data.append('file', this.files[0])
+
+                    fetch(Url, {
+                        method: 'POST',
+                        body: data
+                    })
+                    .then(response => response.json())
+                    .then(response => document.getElementById('classText').innerHTML = response.class_name)
+                    .catch(error => console.log(error))
+                }
+            });
+            });
+        </script>
+    </head>
+
+    <body>
+        <input type='file' />
+        <br><br>
+        <img id="imageData" src="#" alt="your image" height=300>
+        <br><br>
+        <h2 id="classText"></h2>
+    </body>
+</html>
