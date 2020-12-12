@@ -14,6 +14,7 @@ from PIL import Image
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import math
 
 class_index = {
     0: "Angka 1",
@@ -27,6 +28,7 @@ model.eval()
 
 
 def transform_image(image_bytes):
+    
     test_transform = transforms.Compose([
     transforms.Resize((128,128)),
     transforms.ToTensor(),
@@ -40,8 +42,29 @@ def get_prediction(image_bytes):
     tensor_img = transform_image(image_bytes=image_bytes)
     outputs = model(tensor_img.unsqueeze(0))
     predicted_idx = outputs.max(1).indices
+    preds = outputs.squeeze().tolist()
+    preds = get_scaled(preds)
+    preds = dict(sorted(preds.items(), key=lambda x: x[1], reverse=True))
 
-    return class_index[predicted_idx.item()]
+    return preds
+
+
+
+
+def min_max_scale(x,xmax,xmin) :
+    x_scaled = (x - xmin)/(xmax-xmin)
+    return x_scaled
+
+
+def get_scaled(preds) :
+    preds_max = max(preds)
+    preds_min = min(preds)
+    scaled_preds={}
+    for i,pred in enumerate(preds) :
+        result = min_max_scale(pred,preds_max,preds_min) * 100
+        scaled_preds["angka_"+str(i+1)] = result
+    return scaled_preds
+
 
 
 app = Flask(__name__)
@@ -53,7 +76,7 @@ def predict():
         file = request.files['file']
         img_bytes = file.read()
         class_name = get_prediction(image_bytes=img_bytes)
-        return jsonify({'class_name': class_name})
+        return jsonify(class_name)
 
 
 @app.route('/test', methods=['GET'])
