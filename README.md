@@ -1,4 +1,4 @@
-# Finger-Classification-Resnet18
+# Finger-Classification-Resnet50
 
 Finger classification was created as a product of the deep learning course. In this repository, there are a few things to know:
 
