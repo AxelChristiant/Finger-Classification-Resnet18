@@ -29,11 +29,12 @@ model.eval()
 
 def transform_image(image_bytes):
     
-    test_transform = transforms.Compose([
+    test_transform = transforms.Compose([ # proses transform dilakukan secara berurutan
+    #transforms.RandomHorizontalFlip(p=0.2),
     transforms.Resize((128,128)),
+    transforms.Grayscale(num_output_channels=3),   
     transforms.ToTensor(),
-    transforms.Normalize([0.3875, 0.3815, 0.3621],[0.2459, 0.2397, 0.2395])
-    ])
+    transforms.Normalize([0.3629, 0.3629, 0.3629],[0.2279, 0.2279, 0.2279])
     image = Image.open(io.BytesIO(image_bytes))
     return test_transform(image)
 
